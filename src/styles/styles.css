@@ -1,0 +1,298 @@
+@import url('https://fonts.googleapis.com/css2?family=Edu+AU+VIC+WA+NT+Pre:wght@400..700&family=Noto+Sans+KR:wght@100..900&family=Oswald:wght@200..700&display=swap');
+@import url('header.css');
+@import url('home.css');
+@import url('menu.css');
+@import url('testimonials.css');
+@import url('footer.css');
+
+:root {
+    --color-primary-1: #fff9ea;
+    --color-primary-2: #ffe8b4;
+    --color-primary-3: #f8d477;
+    --color-primary-4: #ffe100;
+    --color-primary-5: #ffcb45;
+    --color-primary-6: #e9a209;
+
+    --color-neutral-0: #fff;
+    --color-neutral-1: #1d1d1d;
+}
+
+* {
+    font-family: 'Poppins', sans-serif;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    background-color: var(--color-primary-1);
+}
+
+section {
+    padding: 28px 8%;
+}
+
+.btn-default {
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--color-primary-5);
+    border-radius: 12px;
+    padding: 10px 14px;
+    font-weight: 600;
+    box-shadow: 0px 0px 10px 2px rgba(0, 0, 0, 0.1);
+    cursor: pointer;
+    transition: background-color .3s ease;
+}
+
+.btn-default:hover {
+    background-color: var(--color-primary-3);
+}
+
+.social-media-buttons {
+    display: flex;
+    gap: 18px;
+}
+
+.social-media-buttons a {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 45px;
+    height: 40px;
+    background-color: var(--color-neutral-0);
+    font-size: 1.25rem;
+    border-radius: 10px;
+    text-decoration: none;
+    color: var(--color-neutral-1);
+    box-shadow: 0px 0px 12px 4px rgba(0, 0, 0, 0.1);
+    transition: box-shadow .3s ease;
+}
+
+.social-media-buttons a:hover {
+    box-shadow: 0px 0px 12px 8px rgba(0, 0, 0, 0.1);
+}
+
+.section-title {
+    color: var(--color-primary-6);
+    font-size: 1.563rem;
+}
+
+.section-subtitle {
+    font-size: 2.1875rem;
+}
+
+.container {
+    width: 90%;
+    max-width: 600px;
+    background-color: var(--color-neutral-0);
+    padding: 20px;
+    margin: 20px auto;
+    border-radius: 8px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+h1, h2 {
+    color: var(--color-neutral-1);
+    margin-bottom: 15px;
+}
+
+form {
+    margin-bottom: 20px;
+}
+
+label {
+    display: block;
+    margin: 10px 0 5px;
+    color: var(--color-neutral-1);
+}
+
+input[type="text"],
+input[type="date"],
+textarea {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 10px;
+    border: 1px solid var(--color-primary-2);
+    border-radius: 5px;
+    resize: vertical;
+    font-family: 'Poppins', sans-serif;
+}
+
+button[type="submit"] {
+    width: 100%;
+    padding: 10px;
+    background-color: var(--color-primary-5);
+    color: var(--color-neutral-0);
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s ease;
+}
+
+button[type="submit"]:hover {
+    background-color: var(--color-primary-3);
+}
+
+#registro .registro-lista {
+    margin-top: 20px;
+}
+
+.registro-item {
+    background-color: var(--color-primary-2);
+    padding: 10px;
+    margin-bottom: 10px;
+    border-left: 4px solid var(--color-primary-5);
+    border-radius: 5px;
+}
+
+.registro-item p {
+    margin: 5px 0;
+    color: var(--color-neutral-1);
+}
+
+#loginForm {
+    display: none;
+    position: absolute;
+    top: 60px;
+    right: 130px;
+    background-color: var(--color-neutral-0);
+    padding: 10px;
+    border-radius: 8px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    width: 200px;
+    flex-direction: column;
+    gap: 10px;
+    opacity: 0;
+    transform: translateY(-20px);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    z-index: 1000;
+}
+
+#loginForm.show {
+    display: flex;
+    opacity: 1;
+    transform: translateY(0);
+}
+
+#loginForm input {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid var(--color-primary-2);
+    border-radius: 5px;
+}
+
+#loginForm button {
+    padding: 8px;
+    background-color: var(--color-primary-5);
+    color: var(--color-neutral-0);
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+#loginForm button:hover {
+    background-color: var(--color-primary-3);
+}
+
+/* página do administrador */
+#admin-body {
+    background-color: var(--color-primary-1);
+    min-height: 100vh;  
+}
+
+#admin-body .container {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+    width: 50%;  
+    max-width: 100%;  
+    height: auto;  
+    padding: 40px 2%;  
+}
+
+#admin-body .box {
+    width: 48%;  
+    padding: 20px;
+    background-color: #f4f4f4;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    height: 100%;  
+}
+
+
+#admin-body .registro-lista, 
+#admin-body .professor-lista {
+    margin-top: 20px;
+}
+
+#admin-body .btn-edit, 
+#admin-body .btn-delete {
+    margin-top: 10px;
+    margin-right: 5px;
+    padding: 8px 12px;
+    cursor: pointer;
+    border: none;
+    border-radius: 5px;
+}
+
+#admin-body .btn-edit {
+    background-color: #4CAF50;
+    color: white;
+}
+
+#admin-body .btn-delete {
+    background-color: #f44336;
+    color: white;
+}
+
+
+#admin-body input[type="text"], 
+#admin-body input[type="email"], 
+#admin-body button[type="button"] {
+    width: 100%;
+    padding: 10px;
+    margin: 8px 0;
+    border-radius: 5px;
+    border: 1px solid #ddd;
+}
+
+#admin-body button[type="button"] {
+    background-color: #4CAF50;
+    color: white;
+    cursor: pointer;
+}
+
+#admin-body button[type="button"]:hover {
+    background-color: #45a049;
+}
+
+footer {
+    position: flex;
+    bottom: 0;
+    width: 100%;
+    color: white; 
+    text-align: center;
+    z-index: 1000;
+}
+
+#footer-adm {
+
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    color: white; 
+    text-align: center;
+    z-index: 1000;
+}
+
+
+
+
