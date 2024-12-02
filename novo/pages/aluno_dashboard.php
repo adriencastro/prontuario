@@ -12,6 +12,7 @@ if (!isset($_SESSION['usuario']) || $_SESSION['role'] !== 'aluno') {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard Aluno</title>
     <link rel="stylesheet" href="../css/style.css">
+    <script src="../js/aluno_dashboard.js" defer></script>
 </head>
 <body>
     <header>

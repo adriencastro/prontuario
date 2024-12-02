@@ -16,7 +16,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $stmt = $pdo->prepare("INSERT INTO prontuarios (paciente_id, criado_por, titulo, descricao) VALUES (?, ?, ?, ?)");
     $stmt->execute([$paciente_id, $criado_por, $titulo, $descricao]);
 
-    echo "Prontuário criado com sucesso.";
+    $mensagem = "Prontuário criado com sucesso.";
 }
 
 // Obter pacientes para selecionar ao criar o prontuário
@@ -30,15 +30,19 @@ $pacientes = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Criar Prontuário</title>
     <link rel="stylesheet" href="../css/style.css">
+    <script src="../js/criar_prontuario.js" defer></script>
 </head>
 <body>
     <header>
         <h1>Criar Prontuário</h1>
         <nav>
-            <a href="admin_dashboard.php">Voltar ao Dashboard</a>
+            <a href="<?= ($_SESSION['role'] === 'admin' ? 'admin_dashboard.php' : 'professor_dashboard.php') ?>">Voltar ao Dashboard</a>
         </nav>
     </header>
     <main>
+        <?php if (isset($mensagem)): ?>
+            <p class="sucesso"><?= htmlspecialchars($mensagem) ?></p>
+        <?php endif; ?>
         <form method="POST">
             <label>Paciente:</label>
             <select name="paciente_id" required>
