@@ -1,7 +1,7 @@
 <?php
 $host = 'localhost';
-$dbname = 'u470795851_prontuario';
-$username = 'u470795851_prontuario';  // Ajuste conforme seu ambiente
+$dbname = 'u470795851_medical';
+$username = 'u470795851_medical';  // Ajuste conforme seu ambiente
 $password = '#Ewdfh1k71206';      // Ajuste conforme seu ambiente
 
 try {
