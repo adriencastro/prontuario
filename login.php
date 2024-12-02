@@ -7,6 +7,22 @@ $username = 'u470795851_trabalho'; // Ajuste conforme seu ambiente
 $password = '#Ewdfh1k7'; // Ajuste conforme seu ambiente
 
 
+if ($user && password_verify($senha, $user['senha'])) {
+    $_SESSION['usuario'] = $user['username'];
+    $_SESSION['role'] = $user['role']; // Armazena o papel
+    $_SESSION['user_id'] = $user['id']; // ID do usuário para relacionamentos
+    if ($user['role'] === 'admin') {
+        header('Location: admin_dashboard.php');
+    } elseif ($user['role'] === 'professor') {
+        header('Location: professor_dashboard.php');
+    } else {
+        header('Location: aluno_dashboard.php');
+    }
+    exit;
+}
+
+
+
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     try {
