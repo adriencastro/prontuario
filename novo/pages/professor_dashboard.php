@@ -18,33 +18,51 @@ $alunos = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard Professor</title>
-    <link rel="stylesheet" href="../css/style.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="../js/professor_dashboard.js" defer></script>
 </head>
 <body>
-    <header>
-        <h1>Bem-vindo, <?= htmlspecialchars($_SESSION['usuario']) ?> (Professor)</h1>
-        <nav>
-            <a href="criar_usuario.php">Criar Aluno</a>
-            <a href="listar_prontuarios.php">Listar Prontuários dos Alunos</a>
-            <a href="criar_prontuario.php">Criar Prontuário</a>
-            <a href="logout.php">Sair</a>
-        </nav>
+    <header class="bg-primary text-white p-3">
+        <div class="container">
+            <div class="d-flex justify-content-between align-items-center">
+                <h1>Bem-vindo, <?= htmlspecialchars($_SESSION['usuario']) ?> (Professor)</h1>
+                <nav>
+                    <a href="criar_usuario.php" class="btn btn-light">Criar Aluno</a>
+                    <a href="listar_prontuarios.php" class="btn btn-light">Listar Prontuários dos Alunos</a>
+                    <a href="criar_prontuario.php" class="btn btn-light">Criar Prontuário</a>
+                    <a href="logout.php" class="btn btn-danger">Sair</a>
+                </nav>
+            </div>
+        </div>
     </header>
-    <main>
+    <main class="container mt-4">
         <h2>Alunos Vinculados</h2>
         <?php if (count($alunos) > 0): ?>
-            <ul>
-                <?php foreach ($alunos as $aluno): ?>
-                    <li><?= htmlspecialchars($aluno['username']) ?></li>
-                <?php endforeach; ?>
-            </ul>
+            <div class="table-responsive">
+                <table class="table table-bordered">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Nome de Usuário</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php foreach ($alunos as $aluno): ?>
+                            <tr>
+                                <td><?= htmlspecialchars($aluno['username']) ?></td>
+                                <td>
+                                    <a href="editar_aluno.php?id=<?= $aluno['id'] ?>" class="btn btn-warning btn-sm">Editar</a>
+                                    <a href="excluir_aluno.php?id=<?= $aluno['id'] ?>" class="btn btn-danger btn-sm" onclick="return confirm('Tem certeza que deseja excluir este aluno?');">Excluir</a>
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
+            </div>
         <?php else: ?>
-            <p>Não há alunos vinculados a este professor.</p>
+            <div class="alert alert-warning">Não há alunos vinculados a este professor.</div>
         <?php endif; ?>
-    </main>
-</body>
-</html>
     </main>
 </body>
 </html>
