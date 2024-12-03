@@ -1,4 +1,4 @@
-?php
+<?php
 session_start();
 require_once '../db/db_config.php';
 if (!isset($_SESSION['usuario']) || $_SESSION['role'] !== 'admin') {
@@ -6,46 +6,19 @@ if (!isset($_SESSION['usuario']) || $_SESSION['role'] !== 'admin') {
     exit;
 }
 
-if (!isset($_GET['id'])) {
-    header('Location: admin_dashboard.php');
-    exit;
-}
+// Obter professores e alunos cadastrados
+$stmt_professores = $pdo->query("SELECT * FROM usuarios WHERE role = 'professor'");
+$professores = $stmt_professores->fetchAll(PDO::FETCH_ASSOC);
 
-$id = $_GET['id'];
-$stmt = $pdo->prepare("SELECT * FROM usuarios WHERE id = ?");
-$stmt->execute([$id]);
-$usuario = $stmt->fetch(PDO::FETCH_ASSOC);
-
-if (!$usuario) {
-    header('Location: admin_dashboard.php');
-    exit;
-}
-
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    try {
-        $username = $_POST['username'];
-        $senha = !empty($_POST['senha']) ? password_hash($_POST['senha'], PASSWORD_DEFAULT) : $usuario['senha'];
-        $role = $_POST['role'];
-
-        $stmt = $pdo->prepare("UPDATE usuarios SET username = ?, senha = ?, role = ? WHERE id = ?");
-        $stmt->execute([$username, $senha, $role, $id]);
-
-        echo "Usuário atualizado com sucesso.";
-    } catch (PDOException $e) {
-        if ($e->getCode() == 23000) {
-            $erro = "Erro: Nome de usuário já existe. Por favor, escolha um nome diferente.";
-        } else {
-            $erro = "Erro ao atualizar usuário. Por favor, tente novamente.";
-        }
-    }
-}
+$stmt_alunos = $pdo->query("SELECT * FROM usuarios WHERE role = 'aluno'");
+$alunos = $stmt_alunos->fetchAll(PDO::FETCH_ASSOC);
 ?>
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Editar Usuário</title>
+    <title>Dashboard Admin</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </head>
@@ -53,39 +26,69 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <header class="bg-dark text-white p-3">
         <div class="container">
             <div class="d-flex justify-content-between align-items-center">
-                <h1>Editar Usuário</h1>
+                <h1>Bem-vindo, <?= htmlspecialchars($_SESSION['usuario']) ?> (Admin)</h1>
                 <nav>
-                    <a href="admin_dashboard.php" class="btn btn-light">Voltar</a>
+                    <a href="criar_usuario.php" class="btn btn-light">Criar Usuário</a>
+                    <a href="criar_prontuario.php" class="btn btn-light">Criar Prontuário</a>
+                    <a href="logout.php" class="btn btn-danger">Sair</a>
                 </nav>
             </div>
         </div>
     </header>
     <main class="container mt-4">
-        <?php if (isset($erro)): ?>
-            <div class="alert alert-danger" role="alert">
-                <?= htmlspecialchars($erro) ?>
+        <h2>Professores Cadastrados</h2>
+        <?php if (count($professores) > 0): ?>
+            <div class="table-responsive">
+                <table class="table table-bordered">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Nome de Usuário</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php foreach ($professores as $professor): ?>
+                            <tr>
+                                <td><?= htmlspecialchars($professor['username']) ?></td>
+                                <td>
+                                    <a href="editar_usuario.php?id=<?= $professor['id'] ?>" class="btn btn-warning btn-sm">Editar</a>
+                                    <a href="excluir_usuario.php?id=<?= $professor['id'] ?>" class="btn btn-danger btn-sm" onclick="return confirm('Tem certeza que deseja excluir este usuário?');">Excluir</a>
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
             </div>
+        <?php else: ?>
+            <div class="alert alert-warning">Não há professores cadastrados.</div>
         <?php endif; ?>
-        <form method="POST" class="row g-3">
-            <div class="col-md-6">
-                <label for="username" class="form-label">Nome de Usuário:</label>
-                <input type="text" class="form-control" id="username" name="username" value="<?= htmlspecialchars($usuario['username']) ?>" required>
+
+        <h2 class="mt-5">Alunos Cadastrados</h2>
+        <?php if (count($alunos) > 0): ?>
+            <div class="table-responsive">
+                <table class="table table-bordered">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Nome de Usuário</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php foreach ($alunos as $aluno): ?>
+                            <tr>
+                                <td><?= htmlspecialchars($aluno['username']) ?></td>
+                                <td>
+                                    <a href="editar_usuario.php?id=<?= $aluno['id'] ?>" class="btn btn-warning btn-sm">Editar</a>
+                                    <a href="excluir_usuario.php?id=<?= $aluno['id'] ?>" class="btn btn-danger btn-sm" onclick="return confirm('Tem certeza que deseja excluir este usuário?');">Excluir</a>
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
             </div>
-            <div class="col-md-6">
-                <label for="senha" class="form-label">Senha (deixe em branco para manter a atual):</label>
-                <input type="password" class="form-control" id="senha" name="senha">
-            </div>
-            <div class="col-md-6">
-                <label for="role" class="form-label">Tipo de Usuário:</label>
-                <select class="form-select" id="role" name="role" required>
-                    <option value="professor" <?= $usuario['role'] === 'professor' ? 'selected' : '' ?>>Professor</option>
-                    <option value="aluno" <?= $usuario['role'] === 'aluno' ? 'selected' : '' ?>>Aluno</option>
-                </select>
-            </div>
-            <div class="col-12">
-                <button type="submit" class="btn btn-primary">Atualizar Usuário</button>
-            </div>
-        </form>
+        <?php else: ?>
+            <div class="alert alert-warning">Não há alunos cadastrados.</div>
+        <?php endif; ?>
     </main>
 </body>
 </html>
