@@ -45,9 +45,7 @@ $prontuarios = $stmt->fetchAll(PDO::FETCH_ASSOC);
                             <th>Data de Abertura</th>
                             <th>Escolaridade</th>
                             <th>Ocupação</th>
-                            <th>Estagiário</th>
-                            <th>Orientador</th>
-                            <th>Data e Hora</th>
+                            <th>Ações</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -57,9 +55,9 @@ $prontuarios = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                 <td><?= htmlspecialchars($prontuario['data_abertura']) ?></td>
                                 <td><?= htmlspecialchars($prontuario['escolaridade']) ?></td>
                                 <td><?= htmlspecialchars($prontuario['ocupacao']) ?></td>
-                                <td><?= htmlspecialchars($prontuario['estagiario']) ?></td>
-                                <td><?= htmlspecialchars($prontuario['orientador']) ?></td>
-                                <td><?= htmlspecialchars($prontuario['data_hora']) ?></td>
+                                <td>
+                                    <a href="ver_prontuario_aluno.php?id=<?= $prontuario['id'] ?>" class="btn btn-info btn-sm">Ver Mais</a>
+                                </td>
                             </tr>
                         <?php endforeach; ?>
                     </tbody>

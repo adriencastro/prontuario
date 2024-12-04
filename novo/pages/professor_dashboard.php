@@ -2,21 +2,32 @@
 session_start();
 require_once '../db/db_config.php';
 
+// Verificar se o usuário está logado e tem o papel de professor
 if (!isset($_SESSION['usuario']) || $_SESSION['role'] !== 'professor') {
     header('Location: login.php');
     exit;
 }
 
-// Carregar alunos do professor
+// Obter o ID do professor logado
 $professor_id = $_SESSION['user_id'];
-$stmt_alunos = $pdo->prepare("SELECT * FROM usuarios WHERE criado_por = ?");
-$stmt_alunos->execute([$professor_id]);
-$alunos = $stmt_alunos->fetchAll(PDO::FETCH_ASSOC);
+
+// Carregar alunos criados pelo professor
+try {
+    $stmt_alunos = $pdo->prepare("SELECT * FROM usuarios WHERE criado_por = ? AND role = 'aluno'");
+    $stmt_alunos->execute([$professor_id]);
+    $alunos = $stmt_alunos->fetchAll(PDO::FETCH_ASSOC);
+} catch (PDOException $e) {
+    die("Erro ao buscar alunos: " . $e->getMessage());
+}
 
 // Carregar prontuários dos alunos criados por este professor
-$stmt_prontuarios = $pdo->prepare("SELECT p.*, a.username AS aluno_nome FROM prontuarios p JOIN usuarios a ON p.paciente_id = a.id WHERE a.criado_por = ?");
-$stmt_prontuarios->execute([$professor_id]);
-$prontuarios = $stmt_prontuarios->fetchAll(PDO::FETCH_ASSOC);
+try {
+    $stmt_prontuarios = $pdo->prepare("SELECT p.*, a.username AS aluno_nome FROM prontuarios p JOIN usuarios a ON p.paciente_id = a.id WHERE a.criado_por = ?");
+    $stmt_prontuarios->execute([$professor_id]);
+    $prontuarios = $stmt_prontuarios->fetchAll(PDO::FETCH_ASSOC);
+} catch (PDOException $e) {
+    die("Erro ao buscar prontuários: " . $e->getMessage());
+}
 ?>
 <!DOCTYPE html>
 <html lang="pt-BR">
@@ -82,9 +93,7 @@ $prontuarios = $stmt_prontuarios->fetchAll(PDO::FETCH_ASSOC);
                             <th>Data de Abertura</th>
                             <th>Escolaridade</th>
                             <th>Ocupação</th>
-                            <th>Estagiário</th>
-                            <th>Orientador</th>
-                            <th>Data e Hora</th>
+                            <th>Ações</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -95,9 +104,9 @@ $prontuarios = $stmt_prontuarios->fetchAll(PDO::FETCH_ASSOC);
                                 <td><?= htmlspecialchars($prontuario['data_abertura']) ?></td>
                                 <td><?= htmlspecialchars($prontuario['escolaridade']) ?></td>
                                 <td><?= htmlspecialchars($prontuario['ocupacao']) ?></td>
-                                <td><?= htmlspecialchars($prontuario['estagiario']) ?></td>
-                                <td><?= htmlspecialchars($prontuario['orientador']) ?></td>
-                                <td><?= htmlspecialchars($prontuario['data_hora']) ?></td>
+                                <td>
+                                    <a href="ver_prontuario.php?id=<?= $prontuario['id'] ?>" class="btn btn-info btn-sm">Ver Mais</a>
+                                </td>
                             </tr>
                         <?php endforeach; ?>
                     </tbody>
