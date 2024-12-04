@@ -9,15 +9,32 @@ if (!isset($_SESSION['usuario']) || ($_SESSION['role'] !== 'admin' && $_SESSION[
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $username = $_POST['username'];
     $senha = password_hash($_POST['senha'], PASSWORD_DEFAULT);
-    $role = $_POST['role'];
+    $role = ($_SESSION['role'] === 'professor') ? 'aluno' : $_POST['role'];
     $criado_por = $_SESSION['user_id'];
 
-    $stmt = $pdo->prepare("INSERT INTO usuarios (username, senha, role, criado_por) VALUES (?, ?, ?, ?)");
-    $stmt->execute([$username, $senha, $role, $criado_por]);
+    try {
+        // Inserir usuário na tabela `usuarios`
+        $stmt = $pdo->prepare("INSERT INTO usuarios (username, senha, role, criado_por) VALUES (?, ?, ?, ?)");
+        $stmt->execute([$username, $senha, $role, $criado_por]);
+        $novo_usuario_id = $pdo->lastInsertId();
 
-    echo "Usuário criado com sucesso.";
+        // Se o usuário for um aluno, registrá-lo automaticamente na tabela `pacientes`
+        if ($role === 'aluno') {
+            $stmt_paciente = $pdo->prepare("INSERT INTO pacientes (id, nome_completo, data_nascimento, genero, endereco, telefone, email, contato_emergencia_nome, contato_emergencia_telefone) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
+            $stmt_paciente->execute([$novo_usuario_id, $username, '2000-01-01', 'masculino', 'Endereço Padrão', '000000000', 'email@example.com', 'Contato de Emergência', '000000000']);
+        }
+
+        $sucesso = "Usuário criado com sucesso.";
+    } catch (PDOException $e) {
+        if ($e->getCode() == 23000) {
+            $erro = "Erro: Nome de usuário já existe. Por favor, escolha um nome diferente.";
+        } else {
+            $erro = "Erro ao criar usuário. Por favor, tente novamente.";
+        }
+    }
 }
 ?>
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -39,6 +56,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </div>
     </header>
     <main class="container mt-4">
+        <?php if (isset($erro)): ?>
+            <div class="alert alert-danger" role="alert">
+                <?= htmlspecialchars($erro) ?>
+            </div>
+        <?php endif; ?>
+        <?php if (isset($sucesso)): ?>
+            <div class="alert alert-success" role="alert">
+                <?= htmlspecialchars($sucesso) ?>
+            </div>
+        <?php endif; ?>
         <form method="POST" class="row g-3">
             <div class="col-md-6">
                 <label for="username" class="form-label">Nome de Usuário:</label>
@@ -48,6 +75,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <label for="senha" class="form-label">Senha:</label>
                 <input type="password" class="form-control" id="senha" name="senha" required>
             </div>
+            <?php if ($_SESSION['role'] === 'admin'): ?>
             <div class="col-md-6">
                 <label for="role" class="form-label">Tipo de Usuário:</label>
                 <select class="form-select" id="role" name="role" required>
@@ -55,8 +83,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <option value="aluno">Aluno</option>
                 </select>
             </div>
+            <?php endif; ?>
             <div class="col-12">
-                <button type="submit" class="btn btn-primary">Criar</button>
+                <button type="submit" class="btn btn-primary">Criar Usuário</button>
             </div>
         </form>
     </main>

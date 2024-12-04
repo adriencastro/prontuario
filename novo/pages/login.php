@@ -4,31 +4,35 @@ require_once '../db/db_config.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $username = $_POST['username'];
-    $senha = md5($_POST['password']);
+    $senha = $_POST['senha'];
 
-    $stmt = $pdo->prepare("SELECT * FROM usuarios WHERE username = :username AND senha = :senha");
-    $stmt->execute(['username' => $username, 'senha' => $senha]);
-    $user = $stmt->fetch(PDO::FETCH_ASSOC);
+    try {
+        // Buscar usuário pelo nome de usuário
+        $stmt = $pdo->prepare("SELECT * FROM usuarios WHERE username = ?");
+        $stmt->execute([$username]);
+        $usuario = $stmt->fetch(PDO::FETCH_ASSOC);
 
-    if ($user) {
-        $_SESSION['usuario'] = $user['username'];
-        $_SESSION['role'] = $user['role'];
-        $_SESSION['user_id'] = $user['id'];
+        // Verificar se o usuário foi encontrado e se a senha está correta
+        if ($usuario && password_verify($senha, $usuario['senha'])) {
+            // Configurar sessão do usuário
+            $_SESSION['user_id'] = $usuario['id'];
+            $_SESSION['usuario'] = $usuario['username'];
+            $_SESSION['role'] = $usuario['role'];
 
-        switch ($user['role']) {
-            case 'admin':
+            // Redirecionar para o dashboard apropriado
+            if ($usuario['role'] === 'admin') {
                 header('Location: admin_dashboard.php');
-                break;
-            case 'professor':
+            } elseif ($usuario['role'] === 'professor') {
                 header('Location: professor_dashboard.php');
-                break;
-            case 'aluno':
+            } elseif ($usuario['role'] === 'aluno') {
                 header('Location: aluno_dashboard.php');
-                break;
+            }
+            exit;
+        } else {
+            $erro = "Nome de usuário ou senha inválidos.";
         }
-        exit;
-    } else {
-        $erro = "Usuário ou senha inválidos.";
+    } catch (PDOException $e) {
+        $erro = "Erro ao tentar fazer login. Por favor, tente novamente.";
     }
 }
 ?>
@@ -38,19 +42,34 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login</title>
-    <link rel="stylesheet" href="../css/style.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </head>
 <body>
-    <div class="login-container">
-        <form action="" method="POST">
-            <h1>Login</h1>
-            <input type="text" name="username" placeholder="Usuário" required>
-            <input type="password" name="password" placeholder="Senha" required>
-            <button type="submit">Entrar</button>
-            <?php if (isset($erro)): ?>
-                <p class="error"><?= $erro ?></p>
-            <?php endif; ?>
-        </form>
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <h2 class="text-center">Login</h2>
+                <?php if (isset($erro)): ?>
+                    <div class="alert alert-danger" role="alert">
+                        <?= htmlspecialchars($erro) ?>
+                    </div>
+                <?php endif; ?>
+                <form method="POST">
+                    <div class="mb-3">
+                        <label for="username" class="form-label">Nome de Usuário:</label>
+                        <input type="text" class="form-control" id="username" name="username" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="senha" class="form-label">Senha:</label>
+                        <input type="password" class="form-control" id="senha" name="senha" required>
+                    </div>
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary">Login</button>
+                    </div>
+                </form>
+            </div>
+        </div>
     </div>
 </body>
 </html>

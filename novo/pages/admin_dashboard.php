@@ -1,24 +1,22 @@
 <?php
 session_start();
 require_once '../db/db_config.php';
+
 if (!isset($_SESSION['usuario']) || $_SESSION['role'] !== 'admin') {
     header('Location: login.php');
     exit;
 }
 
-// Obter professores e alunos cadastrados
-$stmt_professores = $pdo->query("SELECT * FROM usuarios WHERE role = 'professor'");
-$professores = $stmt_professores->fetchAll(PDO::FETCH_ASSOC);
-
-$stmt_alunos = $pdo->query("SELECT * FROM usuarios WHERE role = 'aluno'");
-$alunos = $stmt_alunos->fetchAll(PDO::FETCH_ASSOC);
+// Carregar os dados dos usuários
+$stmt = $pdo->query("SELECT * FROM usuarios");
+$usuarios = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard Admin</title>
+    <title>Admin Dashboard</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </head>
@@ -26,33 +24,40 @@ $alunos = $stmt_alunos->fetchAll(PDO::FETCH_ASSOC);
     <header class="bg-dark text-white p-3">
         <div class="container">
             <div class="d-flex justify-content-between align-items-center">
-                <h1>Bem-vindo, <?= htmlspecialchars($_SESSION['usuario']) ?> (Admin)</h1>
+                <h1>Admin Dashboard</h1>
                 <nav>
-                    <a href="criar_usuario.php" class="btn btn-light">Criar Usuário</a>
-                    <a href="criar_prontuario.php" class="btn btn-light">Criar Prontuário</a>
-                    <a href="logout.php" class="btn btn-danger">Sair</a>
+                    <a href="logout.php" class="btn btn-light">Logout</a>
                 </nav>
             </div>
         </div>
     </header>
     <main class="container mt-4">
-        <h2>Professores Cadastrados</h2>
-        <?php if (count($professores) > 0): ?>
+        <h2>Gerenciar Usuários</h2>
+        <div class="mb-3">
+            <a href="criar_usuario.php" class="btn btn-success">Criar Novo Usuário</a>
+        </div>
+        <?php if (count($usuarios) > 0): ?>
             <div class="table-responsive">
                 <table class="table table-bordered">
                     <thead class="table-light">
                         <tr>
+                            <th>ID</th>
                             <th>Nome de Usuário</th>
+                            <th>Tipo de Usuário</th>
+                            <th>Criado Por</th>
                             <th>Ações</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <?php foreach ($professores as $professor): ?>
+                        <?php foreach ($usuarios as $usuario): ?>
                             <tr>
-                                <td><?= htmlspecialchars($professor['username']) ?></td>
+                                <td><?= htmlspecialchars($usuario['id']) ?></td>
+                                <td><?= htmlspecialchars($usuario['username']) ?></td>
+                                <td><?= htmlspecialchars($usuario['role']) ?></td>
+                                <td><?= htmlspecialchars($usuario['criado_por']) ?></td>
                                 <td>
-                                    <a href="editar_usuario.php?id=<?= $professor['id'] ?>" class="btn btn-warning btn-sm">Editar</a>
-                                    <a href="excluir_usuario.php?id=<?= $professor['id'] ?>" class="btn btn-danger btn-sm" onclick="return confirm('Tem certeza que deseja excluir este usuário?');">Excluir</a>
+                                    <a href="editar_usuario.php?id=<?= $usuario['id'] ?>" class="btn btn-warning btn-sm">Editar</a>
+                                    <a href="excluir_usuario.php?id=<?= $usuario['id'] ?>" class="btn btn-danger btn-sm">Excluir</a>
                                 </td>
                             </tr>
                         <?php endforeach; ?>
@@ -60,34 +65,7 @@ $alunos = $stmt_alunos->fetchAll(PDO::FETCH_ASSOC);
                 </table>
             </div>
         <?php else: ?>
-            <div class="alert alert-warning">Não há professores cadastrados.</div>
-        <?php endif; ?>
-
-        <h2 class="mt-5">Alunos Cadastrados</h2>
-        <?php if (count($alunos) > 0): ?>
-            <div class="table-responsive">
-                <table class="table table-bordered">
-                    <thead class="table-light">
-                        <tr>
-                            <th>Nome de Usuário</th>
-                            <th>Ações</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php foreach ($alunos as $aluno): ?>
-                            <tr>
-                                <td><?= htmlspecialchars($aluno['username']) ?></td>
-                                <td>
-                                    <a href="editar_usuario.php?id=<?= $aluno['id'] ?>" class="btn btn-warning btn-sm">Editar</a>
-                                    <a href="excluir_usuario.php?id=<?= $aluno['id'] ?>" class="btn btn-danger btn-sm" onclick="return confirm('Tem certeza que deseja excluir este usuário?');">Excluir</a>
-                                </td>
-                            </tr>
-                        <?php endforeach; ?>
-                    </tbody>
-                </table>
-            </div>
-        <?php else: ?>
-            <div class="alert alert-warning">Não há alunos cadastrados.</div>
+            <div class="alert alert-warning">Não há usuários cadastrados.</div>
         <?php endif; ?>
     </main>
 </body>
